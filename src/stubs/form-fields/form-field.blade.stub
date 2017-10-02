@@ -1,1 +1,7 @@
-{!! Form::%%fieldType%%('%%itemName%%', null, ['class' => 'form-control'%%required%%]) !!}
+<!-- %%fieldType%% - %%itemName%% -->
+<div class="input-field col s12 m6">
+	<i class="fa fa-pencil-square-o  prefix"></i>
+	{!! Form::label('%%itemName%%', '%%itemName%%', array('for' => '%%itemName%%')) !!}
+	{!! Form::%%fieldType%%('%%itemName%%', null, ['class' => 'form-control'%%required%%, 'id' => '%%itemName%%' ]) !!}
+</div>
+<!-- /%%fieldType%% - %%itemName%%-->

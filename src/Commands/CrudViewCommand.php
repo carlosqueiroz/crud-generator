@@ -80,6 +80,7 @@ class CrudViewCommand extends Command
     protected $vars = [
         'formFields',
         'formFieldsHtml',
+        'listDatatables',
         'varName',
         'crudName',
         'crudNameCap',
@@ -110,6 +111,15 @@ class CrudViewCommand extends Command
      * @var string
      */
     protected $formFieldsHtml = '';
+
+    /**
+     * Html of Form's fields.
+     *
+     * @var string
+     */
+    protected $listDatatables = '';
+
+
 
     /**
      * Number of columns to show from the table. Others are hidden.
@@ -324,6 +334,10 @@ class CrudViewCommand extends Command
             $this->formFieldsHtml .= $this->createField($item);
         }
 
+
+
+
+ 
         $i = 0;
         foreach ($this->formFields as $key => $value) {
             if ($i == $this->defaultColumnsToShow) {
@@ -346,6 +360,47 @@ class CrudViewCommand extends Command
 
         $this->info('View created successfully.');
     }
+
+ protected function CreatelistDatatables($urlFinal){
+           // Criando List Datatables no Index
+        $fillables = [];    
+        $i=0;
+        foreach ($this->formFields as $item) {
+         //  $this->listDatatables .= $this->createFieldsDatatable($item);
+         $fillables[$i]['data'] = $item['name'];
+         $fillables[$i]['name'] = $item['name'];
+         $fillables[$i]['visible'] = "true";
+         $fillables[$i]['orderable'] = "true";
+         $fillables[$i]['searchable'] = "true";
+         $i++;
+        }
+        $fillables[$i]['data'] = "action";
+        $fillables[$i]['name'] = "action";
+        $fillables[$i]['visible'] = "true";
+        $fillables[$i]['orderable'] = "false";
+        $fillables[$i]['searchable'] = "false";
+        $this->listDatatables = $this->createFieldsDatatable(json_encode($fillables),$urlFinal);
+
+        // Fim List Datatables no Index
+
+ } 
+  protected function CreateHeadDatatables($urlFinal){
+           // Criando List Datatables no Index
+        $html = "";    
+        $i=0;
+        foreach ($this->formFields as $item) {
+         //  $this->listDatatables .= $this->createFieldsDatatable($item);
+         $html.="<th>".$item['name']."</th>";
+         $i++;
+        }
+        //sdd($html);
+  
+        $this->createTableDatatableHead($html,$urlFinal);
+
+        // Fim List Datatables no Index
+
+ } 
+
 
     /**
      * Default template configuration if not provided
@@ -375,11 +430,18 @@ class CrudViewCommand extends Command
         foreach ($dynamicViewTemplate as $name => $vars) {
             $file = $this->viewDirectoryPath . $name . '.blade.stub';
             $newFile = $path . $name . '.blade.php';
+
             if (!File::copy($file, $newFile)) {
                 echo "failed to copy $file...\n";
             } else {
+                
+                
                 $this->templateVars($newFile, $vars);
                 $this->userDefinedVars($newFile);
+
+                // Chamando Funções para alterar dados do templates
+                $this->CreateHeadDatatables($newFile);
+                $this->CreatelistDatatables($newFile);
             }
         }
     }
@@ -467,6 +529,38 @@ class CrudViewCommand extends Command
             default: // text
                 return $this->createFormField($item);
         }
+    }
+
+    /**
+     * Form field generator.
+     *
+     * @param  array $item
+     *
+     * @return string
+     */
+    protected function createFieldsDatatable($data,$urlFinal)
+    {
+        // Lendo Template
+        $markup = File::get($urlFinal); 
+        // Substituindo Dados
+        $markup = str_replace('%%listDatatables%%', $data, $markup);
+        // Salvando Arquivo (Ele modifica o template... tentar fazer de outra forma)
+       File::put($urlFinal, $markup);
+        //return $markup;
+        
+    
+    }
+
+    protected function createTableDatatableHead($data,$urlFinal)
+    {
+        // Lendo Template
+        $markup = File::get($urlFinal); 
+        // Substituindo Dados
+        $markup = str_replace('%%DatatablesHead%%', $data, $markup);
+        // Salvando Arquivo (Ele modifica o template... tentar fazer de outra forma)
+       File::put($urlFinal, $markup);
+        //return $markup;
+        
     }
 
     /**

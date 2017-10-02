@@ -1,69 +1,79 @@
 @extends('layouts.app')
-
 @section('content')
-    <div class="container">
-        <div class="row">
-            @include('admin.sidebar')
-
-            <div class="col-md-9">
-                <div class="panel panel-default">
-                    <div class="panel-heading">%%crudNameCap%%</div>
-                    <div class="panel-body">
-                        <a href="{{ url('/%%routeGroup%%%%viewName%%/create') }}" class="btn btn-success btn-sm" title="Add New %%modelName%%">
-                            <i class="fa fa-plus" aria-hidden="true"></i> Add New
-                        </a>
-
-                        {!! Form::open(['method' => 'GET', 'url' => '/%%routeGroup%%%%viewName%%', 'class' => 'navbar-form navbar-right', 'role' => 'search'])  !!}
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="search" placeholder="Search...">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="submit">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                        </div>
-                        {!! Form::close() !!}
-
-                        <br/>
-                        <br/>
-                        <div class="table-responsive">
-                            <table class="table table-borderless">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>%%formHeadingHtml%%<th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                @foreach($%%crudName%% as $item)
-                                    <tr>
-                                        <td>{{ $item->id }}</td>
-                                        %%formBodyHtml%%
-                                        <td>
-                                            <a href="{{ url('/%%routeGroup%%%%viewName%%/' . $item->%%primaryKey%%) }}" title="View %%modelName%%"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
-                                            <a href="{{ url('/%%routeGroup%%%%viewName%%/' . $item->%%primaryKey%% . '/edit') }}" title="Edit %%modelName%%"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
-                                            {!! Form::open([
-                                                'method'=>'DELETE',
-                                                'url' => ['/%%routeGroup%%%%viewName%%', $item->%%primaryKey%%],
-                                                'style' => 'display:inline'
-                                            ]) !!}
-                                                {!! Form::button('<i class="fa fa-trash-o" aria-hidden="true"></i> Delete', array(
-                                                        'type' => 'submit',
-                                                        'class' => 'btn btn-danger btn-xs',
-                                                        'title' => 'Delete %%modelName%%',
-                                                        'onclick'=>'return confirm("Confirm delete?")'
-                                                )) !!}
-                                            {!! Form::close() !!}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                            <div class="pagination-wrapper"> {!! $%%crudName%%->appends(['search' => Request::get('search')])->render() !!} </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="card">
+  <div class="title">
+    <h5>%%crudNameCap%%</h5>
+    <div class="btn-group right">
+      <a href="{{ url('/%%routeGroup%%%%viewName%%/create') }}" class="btn btn-small z-depth-0"><i class="mdi mdi-content-add"></i></a>
     </div>
-@endsection
+  </div>
+  <div class="content">
+    <div class="table">
+      <!-- Tabela de Dados -->
+
+           <table class="table table-hover  table-striped responsive nowrap" cellspacing="0" width="100%" id="data-table">
+          <thead>
+              <tr>
+                  %%DatatablesHead%%
+                  <th>Ações</th>
+              </tr>
+          </thead>
+    
+        
+        </table>
+      <!-- /Tabela de Dados -->
+    </div>
+  </div>
+  <!-- Modal Structure -->
+  <div id="modal-excluir" class="modal">
+    <div class="modal-content">
+      <h4>Você  tem certeza que quer excluir este registro?</h4>
+      <p>Exclua este registro somente se você tiver certeza disso.</p>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="waves-effect waves-dark btn light-blue modal-action modal-close">Cancelar</a>
+      <form  id="excluir" action="{{ url('/%%routeGroup%%%%viewName%%/') }}" method="POST">
+        <input type="hidden" name="_method" value="DELETE">
+        <input type="hidden" name="_token" value="{{csrf_token()}}" id="token"/>
+        <button  type="submit"  class="waves-effect waves-dark btn red  modal-action modal-close" type="button">Excluir</button>
+      </form>
+      
+    </div>
+  </div>
+</div>
+@stop
+@push('header.style')
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.0.1/css/responsive.dataTables.min.css"/>
+@endpush
+@push('footer.script')
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/responsive/2.0.1/js/dataTables.responsive.min.js">
+</script>
+<script>
+$(function() {
+var table = $('#data-table').DataTable({
+language: {
+url: '{{asset('assets/dataTables/plugins/lang/Portuguese-Brasil.json')}}'
+},
+"order": [
+[0, "desc"]
+],
+processing: true,
+serverSide: true,
+ajax: '{{url('/%%routeGroup%%%%viewName%%/list')}}',
+columns: %%listDatatables%%
+});
+$('#data-table tbody').on('click', 'tr', function() {
+if ($(this).hasClass('selected')) {
+$(this).removeClass('selected');
+} else {
+table.$('tr.selected').removeClass('selected');
+$(this).addClass('selected');
+}
+});
+});
+function excluir(id) {
+$('#modal-excluir').openModal();
+$('#excluir').attr('action', "{{ url('/%%routeGroup%%%%viewName%%/') }}/"+id+'');
+}
+</script>
+@endpush

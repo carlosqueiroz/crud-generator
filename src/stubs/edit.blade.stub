@@ -1,40 +1,76 @@
 @extends('layouts.app')
-
 @section('content')
-    <div class="container">
-        <div class="row">
-            @include('admin.sidebar')
-
-            <div class="col-md-9">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Edit %%modelName%% #{{ $%%crudNameSingular%%->%%primaryKey%% }}</div>
-                    <div class="panel-body">
-                        <a href="{{ url('/%%routeGroup%%%%viewName%%') }}" title="Back"><button class="btn btn-warning btn-xs"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</button></a>
-                        <br />
-                        <br />
-
-                        @if ($errors->any())
-                            <ul class="alert alert-danger">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        @endif
-
-                        {!! Form::model($%%crudNameSingular%%, [
-                            'method' => 'PATCH',
-                            'url' => ['/%%routeGroup%%%%viewName%%', $%%crudNameSingular%%->%%primaryKey%%],
-                            'class' => 'form-horizontal',
-                            'files' => true
-                        ]) !!}
-
-                        @include ('%%viewTemplateDir%%.form', ['submitButtonText' => 'Update'])
-
-                        {!! Form::close() !!}
-
-                    </div>
-                </div>
-            </div>
+<div>
+  <div class="row">
+    <div class="col s12">
+    @if ($errors->any())
+         <ul class="alert alert-danger">
+             @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+             @endforeach
+         </ul>
+    @endif
+    {!! Form::model($%%crudNameSingular%%, [
+         'method' => 'PATCH',
+         'url' => ['/%%routeGroup%%%%viewName%%', $%%crudNameSingular%%->%%primaryKey%%],
+         'class' => 'form-horizontal',
+         'files' => true
+    ]) !!}
+      
+      <!-- Submit Field -->
+      <div class="row">
+        <div class="col s12">
+          <div class="right-align">
+            {!! Form::submit('Salvar', ['class' => 'btn btn-primary form-control']) !!}
+            <a href="{{ url('/%%routeGroup%%%%viewName%%') }}" class="btn btn-primary form-control">Cancelar</a>
+          </div>
         </div>
+      </div>
+      <br>
+      <!-- /Submit Field -->
+      <div class="card">
+        <div class="title">
+          <h5><i class="mdi mdi-action-speaker-notes"></i> %%modelName%% | {{ $%%crudNameSingular%%->%%primaryKey%% }}</h5>
+          <a class="minimize" href="#">
+            <i class="mdi-navigation-expand-less"></i>
+          </a>
+        </div>
+        <div class="content">
+          <div class="row no-margin-top">
+            <!-- Conteudo -->
+             @include ('%%viewTemplateDir%%.form', ['submitButtonText' => 'Update'])
+            <!--/Conteudo -->
+          </div>
+        </div>
+      </div>
+      <div>
+        <!-- Submit Field -->
+        <div class="row">
+          <div class="col s12">
+            <div class="right-align">
+              {!! Form::submit('Salvar', ['class' => 'btn btn-primary form-control']) !!}
+              <a href="{{ url('/%%routeGroup%%%%viewName%%') }}" class="btn btn-primary form-control">Cancelar</a>
+            </div>
+          </div>
+        </div>
+        <!-- /Submit Field -->
+      </div>
     </div>
+   {!! Form::close() !!}
+  </div>
+</div>
 @endsection
+
+@push('header.style')
+<!-- CSS Libs-->
+
+<!--/CSS Libs-->
+@endpush
+@push('footer.script')
+<!-- Javascript Libs -->
+
+<!--/Javascript Libs -->
+<script>
+
+</script>
+@endpush

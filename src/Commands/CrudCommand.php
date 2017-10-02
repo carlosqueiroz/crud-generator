@@ -132,6 +132,13 @@ class CrudCommand extends Command
         if (file_exists($routeFile) && (strtolower($this->option('route')) === 'yes')) {
             $this->controller = ($controllerNamespace != '') ? $controllerNamespace . '\\' . $name . 'Controller' : $name . 'Controller';
 
+            // Comentário
+            File::append($routeFile, "\n" . implode("\n", $this->addRoutesComments()));
+
+            //Rota Get List
+            $isAdded = File::append($routeFile, "\n" . implode("\n", $this->addRouteList()));
+            
+            //Rota Resource
             $isAdded = File::append($routeFile, "\n" . implode("\n", $this->addRoutes()));
 
             if ($isAdded) {
@@ -151,7 +158,16 @@ class CrudCommand extends Command
     {
         return ["Route::resource('" . $this->routeName . "', '" . $this->controller . "');"];
     }
-
+    //Acidionando List
+    protected function addRouteList()
+    {
+        return ["Route::get('".$this->routeName."/list', ['as' => '".$this->routeName.".list' , 'uses' => '".$this->controller."@list']);"];
+    }
+    //Acidionando Comentario
+    protected function addRoutesComments()
+    {
+        return ["//".$this->routeName." | Route"];
+    }
     /**
      * Process the JSON Fields.
      *
